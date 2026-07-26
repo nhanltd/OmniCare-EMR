@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "omnicare-emr-api-collection",
+		"name": "OmniCare EMR Core Backend API Collection",
+		"description": "Complete Postman API Collection covering Phase 1 to Phase 4 for OmniCare EMR System.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Phase 1 - Administrative (Patient & Practitioner)",
+			"item": [
+				{
+					"name": "GET List Practitioners",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/practitioners",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"practitioners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Practitioner By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/practitioners/11111111-1111-1111-1111-111111111111",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"practitioners",
+								"11111111-1111-1111-1111-111111111111"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Practitioner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"practitionerCode\": \"PRAC-099\",\n  \"fullName\": \"Dr. Alexander Fleming\",\n  \"specialty\": \"INFECTIOUS_DISEASE\",\n  \"practitionerType\": \"DOCTOR\",\n  \"phone\": \"+84909999888\",\n  \"email\": \"alexander.fleming@omnicare.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/practitioners",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"practitioners"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Patient By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/patients/a0000000-0000-0000-0000-000000000001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"a0000000-0000-0000-0000-000000000001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Create Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identifier\": \"079090009999\",\n  \"fullName\": \"Võ Văn Giang\",\n  \"gender\": \"male\",\n  \"birthDate\": \"1992-05-20\",\n  \"phoneNumber\": \"+84909999000\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Phase 2 - Clinical Core (Encounter & Vitals)",
+			"item": [
+				{
+					"name": "POST Create Planned Encounter",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"a0000000-0000-0000-0000-000000000001\",\n  \"practitionerId\": \"11111111-1111-1111-1111-111111111111\",\n  \"encounterDate\": \"2026-07-26T15:00:00Z\",\n  \"reason\": \"Khám tổng quát định kỳ\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/encounters",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"encounters"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Encounter By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/encounters/e0000000-0000-0000-0000-000000000001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"encounters",
+								"e0000000-0000-0000-0000-000000000001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Record Vitals (JSONB Observation)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"encounterId\": \"e0000000-0000-0000-0000-000000000003\",\n  \"valueJson\": {\n    \"bloodPressure\": \"120/80\",\n    \"heartRate\": 75,\n    \"temperature\": 36.8,\n    \"spo2\": 99\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/observations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"observations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Observations By Encounter ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/observations?encounterId=e0000000-0000-0000-0000-000000000001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"observations"
+							],
+							"query": [
+								{
+									"key": "encounterId",
+									"value": "e0000000-0000-0000-0000-000000000001"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Phase 3 - LIS Webhook & Finalize Exam",
+			"item": [
+				{
+					"name": "PUT Webhook LIS Test Result",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"testCode\": \"GLU-01\",\n  \"testName\": \"Fasting Blood Glucose\",\n  \"resultValue\": \"7.5\",\n  \"unit\": \"mmol/L\",\n  \"referenceRange\": \"3.9 - 6.4\",\n  \"flag\": \"HIGH\",\n  \"status\": \"FINAL\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/diagnostic-reports/c0000000-0000-0000-0000-000000000001/results",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnostic-reports",
+								"c0000000-0000-0000-0000-000000000001",
+								"results"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Finalize Encounter Exam",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"diagnoses\": [\n    {\n      \"icd10Code\": \"L23.9\",\n      \"description\": \"Allergic contact dermatitis, unspecified cause\"\n    }\n  ],\n  \"prescriptions\": [\n    {\n      \"medicationName\": \"Cetirizine 10mg\",\n      \"dosage\": 10.0,\n      \"frequency\": \"1 tablet daily at bedtime\",\n      \"duration\": \"7 days\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/encounters/e0000000-0000-0000-0000-000000000003/finalize",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"encounters",
+								"e0000000-0000-0000-0000-000000000003",
+								"finalize"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Phase 4 - Operational Analytics & Clinical History",
+			"item": [
+				{
+					"name": "GET Operational KPIs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/analytics/operational-kpis",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"analytics",
+								"operational-kpis"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Patient Clinical History Timeline",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/patients/a0000000-0000-0000-0000-000000000001/clinical-history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"a0000000-0000-0000-0000-000000000001",
+								"clinical-history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8686",
+			"type": "string"
+		}
+	]
+}

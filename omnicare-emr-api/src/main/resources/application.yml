@@ -1,0 +1,38 @@
+server:
+  port: 8686
+
+spring:
+  application:
+    name: omnicare-emr-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/omnicare_db
+    username: omnicare_user
+    password: omnicare_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: alpha
+    tagsSorter: alpha
+    enabled: true
