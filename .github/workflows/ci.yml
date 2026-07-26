@@ -1,0 +1,65 @@
+name: OmniCare EMR Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  backend-build-and-test:
+    name: Build & Test (Java 17 & PostgreSQL)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: omnicare_db
+          POSTGRES_USER: omnicare_user
+          POSTGRES_PASSWORD: omnicare_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Verify Maven Wrapper & Environment
+        run: |
+          cd omnicare-emr-api
+          mvn --version
+
+      - name: Compile and Run Integration Tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/omnicare_db
+          SPRING_DATASOURCE_USERNAME: omnicare_user
+          SPRING_DATASOURCE_PASSWORD: omnicare_pass
+        run: |
+          cd omnicare-emr-api
+          mvn clean test --batch-mode
+
+      - name: Upload Test Reports Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: omnicare-emr-api/target/surefire-reports/
+          retention-days: 7
