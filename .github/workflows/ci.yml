@@ -13,23 +13,8 @@ permissions:
 
 jobs:
   backend-build-and-test:
-    name: Build & Test (Java 17 & PostgreSQL)
+    name: Build & Test (Java 17 Spring Boot API)
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: omnicare_db
-          POSTGRES_USER: omnicare_user
-          POSTGRES_PASSWORD: omnicare_pass
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U omnicare_user -d omnicare_db"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - name: Checkout Code Repository
@@ -45,9 +30,7 @@ jobs:
 
       - name: Compile and Run All Tests with Maven
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/omnicare_db
-          SPRING_DATASOURCE_USERNAME: omnicare_user
-          SPRING_DATASOURCE_PASSWORD: omnicare_pass
+          SPRING_PROFILES_ACTIVE: test
         run: |
           mvn clean test -f omnicare-emr-api/pom.xml --batch-mode
 
