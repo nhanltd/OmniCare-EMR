@@ -26,7 +26,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U omnicare_user -d omnicare_db"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -41,20 +41,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
+          cache-dependency-path: 'omnicare-emr-api/pom.xml'
 
-      - name: Verify Maven Wrapper & Environment
-        run: |
-          cd omnicare-emr-api
-          mvn --version
-
-      - name: Compile and Run Integration Tests
+      - name: Compile and Run All Tests with Maven
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/omnicare_db
           SPRING_DATASOURCE_USERNAME: omnicare_user
           SPRING_DATASOURCE_PASSWORD: omnicare_pass
         run: |
-          cd omnicare-emr-api
-          mvn clean test --batch-mode
+          mvn clean test -f omnicare-emr-api/pom.xml --batch-mode
 
       - name: Upload Test Reports Artifact
         if: always()
