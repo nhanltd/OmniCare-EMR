@@ -1,0 +1,33 @@
+```markdown
+# TÀI LIỆU LUỒNG NGHIỆP VỤ HỆ THỐNG - OMNICARE EMR
+
+**Người thiết kế:** Lê Thành Nhân[cite: 5]
+**Mục tiêu:** Làm rõ tương tác giữa các tác nhân (Bệnh nhân, Lễ tân, Bác sĩ, Máy xét nghiệm) với các phân hệ trong hệ thống phần mềm (Backend API, CSDL)[cite: 5]. Luồng nghiệp vụ được thiết kế chặt chẽ, tối ưu hóa các điểm nghẽn (bottleneck) để tăng tốc độ khám chữa bệnh[cite: 5].
+
+## Luồng 1: Quy trình Tiếp đón (Registration & Triage)[cite: 5]
+Luồng này xảy ra khi bệnh nhân lần đầu tiên bước vào cửa bệnh viện[cite: 5]. Hệ thống cần định danh người bệnh và tạo bối cảnh (context) cho phiên khám[cite: 5].
+
+1.  **Bước 1:** Bệnh nhân cung cấp Căn cước công dân (CCCD) tại quầy Lễ tân[cite: 5].
+2.  **Bước 2:** Lễ tân nhập CCCD vào màn hình EMR[cite: 5]. Frontend gọi API `GET /api/v1/patients?identifier={cccd}`[cite: 5].
+    *   Nếu tồn tại: Load hồ sơ cũ của bệnh nhân (Lịch sử bệnh án)[cite: 5].
+    *   Nếu chưa tồn tại: Lễ tân điền form tạo mới, gọi API `POST /api/v1/patients`[cite: 5].
+3.  **Bước 3:** Lễ tân tạo một phiên khám mới cho bệnh nhân, gán vào phòng khám của Bác sĩ chuyên khoa[cite: 5]. Hệ thống gọi API `POST /api/v1/encounters` với trạng thái `PLANNED`[cite: 5].
+4.  **Bước 4:** Điều dưỡng tại phòng khám tiếp nhận, đo huyết áp, nhịp tim và gọi API `POST /api/v1/observations` để lưu các sinh hiệu ban đầu vào phiên khám này[cite: 5].
+
+## Luồng 2: Khám Lâm Sàng & Ra Y Lệnh (Clinical Exam & Ordering)[cite: 5]
+Đây là luồng cốt lõi, thể hiện sự tương tác giữa Bác sĩ và EMR[cite: 5]. Thiết kế UI/UX theo nguyên tắc "Rule of Three Clicks" để giảm thiểu thời gian thao tác máy tính[cite: 5].
+
+1.  **Bước 1:** Bác sĩ chọn bệnh nhân từ danh sách hàng đợi[cite: 5]. Trạng thái Encounter chuyển từ `PLANNED` sang `IN_PROGRESS`[cite: 5].
+2.  **Bước 2:** Màn hình Dashboard hiển thị toàn bộ lịch sử (Dị ứng thuốc, bệnh nền, sinh hiệu do điều dưỡng vừa đo)[cite: 5].
+3.  **Bước 3:** Bác sĩ tiến hành hỏi bệnh[cite: 5]. Nếu cần xét nghiệm thêm, bác sĩ chọn y lệnh (Ví dụ: Xét nghiệm máu Sinh hóa)[cite: 5].
+4.  **Bước 4 (Tích hợp LIS):** Hệ thống Backend EMR tự động sinh ra một gói tin (HL7 ORM) và gọi API/Message Queue đẩy y lệnh này sang Hệ thống xét nghiệm tự động (LIS)[cite: 5]. Bệnh nhân được điều hướng đi lấy máu[cite: 5].
+
+## Luồng 3: Tự động hóa Nhận Kết Quả & Chốt Bệnh Án[cite: 5]
+Thể hiện khả năng làm việc theo hướng sự kiện (Event-driven) và xử lý Transaction phức tạp của Backend[cite: 5].
+
+1.  **Bước 1 (Nhận kết quả tự động):** Máy phân tích máu chạy xong, LIS tự động gọi Webhook `PUT /api/v1/diagnostic-reports/{id}/results` của EMR để trả kết quả[cite: 5].
+2.  **Bước 2:** EMR lưu kết quả vào database (dạng JSONB trong bảng Observation) và ngay lập tức kích hoạt Web Socket đẩy thông báo (Alert) thời gian thực lên màn hình của Bác sĩ lâm sàng[cite: 5].
+3.  **Bước 3 (Chẩn đoán & Kê đơn):** Bác sĩ xem kết quả xét nghiệm, đưa ra mã bệnh ICD-10 (Ví dụ: E11 - Tiểu đường type 2) và kê đơn thuốc trên giao diện[cite: 5].
+4.  **Bước 4 (Ký số & Finalize):** Bác sĩ ấn nút "Chốt Bệnh Án"[cite: 5]. Frontend gom toàn bộ dữ liệu (Chẩn đoán + Đơn thuốc) gửi cục bộ lên API `POST /api/v1/encounters/{id}/finalize`[cite: 5].
+5.  **Bước 5 (Database Transaction):** Spring Boot mở Transaction, lưu toàn bộ dữ liệu[cite: 5]. Đóng băng bệnh án (chuyển Encounter status thành `FINISHED`)[cite: 5]. Nếu có bất kỳ lỗi nào xảy ra ở database, toàn bộ quá trình được Rollback để đảm bảo dữ liệu không bị sai lệch[cite: 5].
+6.  **Bước 6:** Hệ thống lưu vết thao tác (Audit Log) ghi nhận thời điểm bác sĩ hoàn thành quy trình để đáp ứng tiêu chuẩn pháp lý[cite: 5].

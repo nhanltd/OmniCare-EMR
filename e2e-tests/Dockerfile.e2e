@@ -1,0 +1,25 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies required for psycopg2 compilation if needed
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    curl \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV BASE_URL=http://omnicare-emr-api:8080
+ENV DB_HOST=postgres
+ENV DB_PORT=5432
+ENV DB_NAME=omnicare_db
+ENV DB_USER=omnicare_user
+ENV DB_PASS=omnicare_pass
+
+ENTRYPOINT ["python", "e2e_test_suite.py"]
